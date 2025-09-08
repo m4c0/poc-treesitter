@@ -1,3 +1,6 @@
+#pragma leco test
+#pragma leco add_impl treesitter
+
 extern "C" {
 #include "tree-sitter/lib/include/tree_sitter/api.h"
 const TSLanguage *tree_sitter_cpp();
