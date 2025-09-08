@@ -3,7 +3,7 @@
 
 extern "C" {
 #include "tree-sitter/lib/include/tree_sitter/api.h"
-const TSLanguage *tree_sitter_cpp();
+const TSLanguage *tree_sitter_java();
 }
 
 #include <stdio.h>
@@ -18,10 +18,10 @@ void dump(TSNode node, unsigned indent) {
 
 int main() {
   TSParser * parser = ts_parser_new();
-  ts_parser_set_language(parser, tree_sitter_cpp());
+  ts_parser_set_language(parser, tree_sitter_java());
 
   TSInput input{
-      .payload = fopen("test.cppm", "rb"),
+      .payload = fopen("test.java", "rb"),
       .read = [](void *payload, uint32_t index, TSPoint pos,
                  uint32_t *bytes) -> const char * {
         static char buf[10240]{};
