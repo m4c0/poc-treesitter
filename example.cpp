@@ -8,6 +8,7 @@ const TSLanguage *tree_sitter_java();
 
 import hay;
 import jojo;
+import jute;
 import print;
 
 void dump(TSNode node, unsigned indent) {
@@ -17,12 +18,39 @@ void dump(TSNode node, unsigned indent) {
   }
 }
 
-int main() {
+int main() try {
+  auto language = tree_sitter_java();
+
   hay<TSParser *, ts_parser_new, ts_parser_delete> parser {};
-  ts_parser_set_language(parser, tree_sitter_java());
+  ts_parser_set_language(parser, language);
 
   auto src = jojo::read_cstr("test.java");
   TSTree *tree = ts_parser_parse_string(parser, nullptr, src.begin(), src.size());
   TSNode node = ts_tree_root_node(tree);
-  dump(node, 0);
+  //dump(node, 0);
+
+  jute::view query_src = "(import_declaration (scoped_identifier) @import)";
+  unsigned err_ofs {};
+  TSQueryError err {};
+  hay<TSQuery *, ts_query_new, ts_query_delete> query {
+    language,
+    query_src.begin(),
+    query_src.size(),
+    &err_ofs,
+    &err
+  };
+  if (err) die("Error: ", static_cast<unsigned>(err));
+
+  hay<TSQueryCursor *, ts_query_cursor_new, ts_query_cursor_delete> cursor {};
+  ts_query_cursor_exec(cursor, query, node);
+
+  TSQueryMatch match {};
+  while (ts_query_cursor_next_match(cursor, &match)) {
+    putln("match");
+    for (auto i = 0; i < match.capture_count; i++) {
+      dump(match.captures[i].node, 2);
+    }
+  }
+} catch (...) {
+  return 1;
 }
