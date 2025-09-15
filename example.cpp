@@ -52,6 +52,16 @@ int main() try {
       putfn("  %.*s", e - s, src.begin() + s);
     }
   }
+
+  // Same, but iterate over captures
+  ts_query_cursor_exec(cursor, query, node);
+  unsigned cap_idx {};
+  while (ts_query_cursor_next_capture(cursor, &match, &cap_idx)) {
+    auto n = match.captures[cap_idx].node;
+    auto s = ts_node_start_byte(n);
+    auto e = ts_node_end_byte(n);
+    putfn("  %.*s", e - s, src.begin() + s);
+  }
 } catch (...) {
   return 1;
 }
